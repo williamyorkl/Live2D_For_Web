@@ -5,14 +5,14 @@
  * that can be found at https://www.live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
 
-import { CubismIdHandle } from '@framework/id/cubismid';
-import { CubismFramework } from '@framework/live2dcubismframework';
-import { live2d_view, LAppDelegate } from './lappdelegate';
-import { LAppPal } from './lapppal';
+import { CubismIdHandle } from "@framework/id/cubismid";
+import { CubismFramework } from "@framework/live2dcubismframework";
+import { live2d_view, LAppDelegate } from "./lappdelegate";
+import { LAppPal } from "./lapppal";
 
 function getElementTop(element) {
-  var actualTop = element.offsetTop;
-  var current = element.offsetParent;
+  let actualTop = element.offsetTop;
+  let current = element.offsetParent;
   while (current !== null) {
     actualTop += current.offsetTop;
     current = current.offsetParent;
@@ -21,8 +21,8 @@ function getElementTop(element) {
 }
 
 function getElementLeft(element) {
-  var actualLeft = element.offsetLeft;
-  var current = element.offsetParent;
+  let actualLeft = element.offsetLeft;
+  let current = element.offsetParent;
   while (current !== null) {
     actualLeft += current.offsetLeft;
     current = current.offsetParent;
@@ -70,15 +70,15 @@ export class Live2dAPI {
   down;
 
   constructor() {
-    let api = this;
+    const api = this;
     this.delegate = new LAppDelegate(this);
     this.resetExpression = new ResetExpression();
     this.move = function (a: MouseEvent) {
       api.touchMoved(a.x, a.y);
-    }
+    };
     this.down = function (a: MouseEvent) {
       api.touchEnded(a.x, a.y);
-    }
+    };
   }
 
   public init(width: number, height: number) {
@@ -86,13 +86,13 @@ export class Live2dAPI {
       return false;
     }
     this.view = live2d_view;
-    let liveapi = this;
+    const liveapi = this;
     this.view.onresize = function () {
       liveapi.delegate.onResize(liveapi.view.width, liveapi.view.height);
-    }
+    };
     live2d_view.style.position = "fixed";
     live2d_view.style.right = "0px";
-    live2d_view.style.bottom = "0px"
+    live2d_view.style.bottom = "0px";
     return true;
   }
 
@@ -126,7 +126,7 @@ export class Live2dAPI {
   }
 
   public setMotionRandom(open: boolean) {
-    var model = this.delegate._manager._model;
+    const model = this.delegate._manager._model;
     if (model) {
       model._motionRandom = open;
       return true;
@@ -135,23 +135,21 @@ export class Live2dAPI {
   }
 
   public setParameter(id: string, value: number) {
-    let model = this.delegate._manager._model;
-    if (model == null)
-      return null;
-    let model1 = model.getModel();
+    const model = this.delegate._manager._model;
+    if (model == null) return null;
+    const model1 = model.getModel();
     model1.setParameterValueById(this.getID(id), value);
   }
 
   public getParameters() {
-    let model = this.delegate._manager._model;
-    if (model == null)
-      return null;
-    let model1 = model.getModel();
-    let list = new Array();
-    let list1 = model1.getModel().parameters;
+    const model = this.delegate._manager._model;
+    if (model == null) return null;
+    const model1 = model.getModel();
+    const list = [];
+    const list1 = model1.getModel().parameters;
 
     for (let a = 0; a < list1.count; a++) {
-      let item = new Parameters();
+      const item = new Parameters();
       item.id = list1.ids[a];
       item.defaultValue = list1.defaultValues[a];
       item.keyCount = list1.keyCounts[a];
@@ -165,23 +163,21 @@ export class Live2dAPI {
   }
 
   public setPart(id: string, value: number) {
-    let model = this.delegate._manager._model;
-    if (model == null)
-      return null;
-    let model1 = model.getModel();
+    const model = this.delegate._manager._model;
+    if (model == null) return null;
+    const model1 = model.getModel();
     model1.setPartOpacityById(this.getID(id), value);
   }
 
   public getParts() {
-    let model = this.delegate._manager._model;
-    if (model == null)
-      return null;
-    let model1 = model.getModel();
-    let list = new Array();
-    let list1 = model1.getModel().parts;
+    const model = this.delegate._manager._model;
+    if (model == null) return null;
+    const model1 = model.getModel();
+    const list = [];
+    const list1 = model1.getModel().parts;
 
     for (let a = 0; a < list1.count; a++) {
-      let item = new Parts();
+      const item = new Parts();
       item.count = list1.count[a];
       item.ids = list1.ids[a];
       item.opacities = list1.opacities[a];
@@ -192,7 +188,7 @@ export class Live2dAPI {
   }
 
   public setBreathName(name: string) {
-    let id = this.getID(name);
+    const id = this.getID(name);
     this.delegate._manager._model._idParamBreath = id;
   }
 
@@ -206,19 +202,18 @@ export class Live2dAPI {
         return false;
       }
       this.delegate.getManager().loadModel(name, this.path);
-    }
-    else {
+    } else {
       this.path = path;
       this.delegate.getManager().loadModel(name, path);
     }
-    let liveapi = this;
-    let timer = setTimeout(function () {
-      let list = liveapi.getExpressions();
+    const liveapi = this;
+    const timer = setTimeout(function () {
+      const list = liveapi.getExpressions();
       if (list == null) {
         LAppPal.printMessage(`[APP]no expression`);
         return;
       }
-      list.forEach(item => {
+      list.forEach((item) => {
         if (item.name.toLowerCase() == "normal")
           liveapi.resetExpression.name = item[0].name;
       });
@@ -240,40 +235,38 @@ export class Live2dAPI {
   }
 
   public fixPos(x: number, y: number) {
-    let width = live2d_view.width;
-    let height = live2d_view.height;
-    let posX = getElementLeft(live2d_view);
-    let posY = getElementTop(live2d_view);
-    let fixX = posX + width;
-    let fixY = posY + height;
-    let width1 = window.innerWidth;
-    let height1 = window.innerHeight;
+    const width = live2d_view.width;
+    const height = live2d_view.height;
+    const posX = getElementLeft(live2d_view);
+    const posY = getElementTop(live2d_view);
+    const fixX = posX + width;
+    const fixY = posY + height;
+    const width1 = window.innerWidth;
+    const height1 = window.innerHeight;
 
     const range = 50;
 
     if (x < posX) {
-      x = -((posX - x) / posX * range);
+      x = -(((posX - x) / posX) * range);
     } else if (x >= posX && x <= fixX) {
       x = x - posX;
-    }
-    else {
-      x = width + ((x - fixX) / (width1 - fixX) * range);
+    } else {
+      x = width + ((x - fixX) / (width1 - fixX)) * range;
     }
 
     if (y < posY) {
-      y = -((posY - y) / posY * range);
+      y = -(((posY - y) / posY) * range);
     } else if (y >= posY && x <= fixY) {
       y = y - posY;
-    }
-    else {
-      y = height + ((y - fixY) / (height1 - fixY) * range);
+    } else {
+      y = height + ((y - fixY) / (height1 - fixY)) * range;
     }
 
     return [x, y];
   }
 
   public touchesBegan(x: number, y: number) {
-    let view = this.delegate.getView();
+    const view = this.delegate.getView();
     if (view == null) {
       return false;
     }
@@ -284,7 +277,7 @@ export class Live2dAPI {
   }
 
   public touchMoved(x: number, y: number) {
-    let view = this.delegate.getView();
+    const view = this.delegate.getView();
     if (view == null) {
       return false;
     }
@@ -295,7 +288,7 @@ export class Live2dAPI {
   }
 
   public touchEnded(x: number, y: number) {
-    let view = this.delegate.getView();
+    const view = this.delegate.getView();
     if (view == null) {
       return false;
     }
@@ -320,24 +313,22 @@ export class Live2dAPI {
   }
 
   public getMotions() {
-    let model = this.delegate.getManager().getModel();
+    const model = this.delegate.getManager().getModel();
     if (model == null) {
       return null;
     }
 
-    let set = model.getModelSetting();
-    if (set == null)
-      return null;
-    let count1 = set.getMotionGroupCount();
-    if (count1 == 0)
-      return null;
-    let list = new Array();
+    const set = model.getModelSetting();
+    if (set == null) return null;
+    const count1 = set.getMotionGroupCount();
+    if (count1 == 0) return null;
+    const list = [];
     for (let a = 0; a < count1; a++) {
-      let list1 = new Array();
-      let item = set.getMotionGroupName(a);
-      let count2 = set.getMotionCount(item);
+      const list1 = [];
+      const item = set.getMotionGroupName(a);
+      const count2 = set.getMotionCount(item);
       for (let b = 0; b < count2; b++) {
-        let item1 = set.getMotionFileName(item, b);
+        const item1 = set.getMotionFileName(item, b);
         list1[b] = item1;
       }
       list[item] = list1;
@@ -347,31 +338,29 @@ export class Live2dAPI {
   }
 
   public getExpressions() {
-    let model = this.delegate.getManager().getModel();
+    const model = this.delegate.getManager().getModel();
     if (model == null) {
       return null;
     }
 
-    let set = model.getModelSetting();
-    if (set == null)
-      return null;
-    let count1 = set.getExpressionCount();
-    if (count1 == 0)
-      return null;
-    let list = new Array();
+    const set = model.getModelSetting();
+    if (set == null) return null;
+    const count1 = set.getExpressionCount();
+    if (count1 == 0) return null;
+    const list = [];
     for (let a = 0; a < count1; a++) {
-      let item = set.getExpressionName(a);
-      let item1 = set.getExpressionFileName(a);
+      const item = set.getExpressionName(a);
+      const item1 = set.getExpressionFileName(a);
       list[a] = {
         name: item,
-        file: item1
+        file: item1,
       };
     }
     return list;
   }
 
   public startMotion(group: string, no: number, priority: number) {
-    let model = this.delegate.getManager().getModel();
+    const model = this.delegate.getManager().getModel();
     if (model == null) {
       return false;
     }
@@ -381,7 +370,7 @@ export class Live2dAPI {
   }
 
   public startExpression(name: string) {
-    let model = this.delegate.getManager().getModel();
+    const model = this.delegate.getManager().getModel();
     if (model == null) {
       return false;
     }
@@ -390,15 +379,19 @@ export class Live2dAPI {
   }
 
   public tickResetExpression() {
-    if (this.resetExpression.run == true)
-      return;
-    let model = this.delegate.getManager().getModel();
+    if (this.resetExpression.run == true) return;
+    const model = this.delegate.getManager().getModel();
     if (model != null) {
-      if (this.resetExpression.enable == true && this.resetExpression.name != null) {
+      if (
+        this.resetExpression.enable == true &&
+        this.resetExpression.name != null
+      ) {
         this.resetExpression.run = true;
-        let liveapi = this;
-        let timer = setTimeout(function () {
-          LAppPal.printMessage(`[APP]expression reset ${liveapi.resetExpression.name}`);
+        const liveapi = this;
+        const timer = setTimeout(function () {
+          LAppPal.printMessage(
+            `[APP]expression reset ${liveapi.resetExpression.name}`
+          );
           model.setExpression(liveapi.resetExpression.name);
           this.resetExpression.run = false;
           clearInterval(timer);
@@ -412,5 +405,5 @@ console.log("live2dAPI init");
 window["live2d"] = {
   new: function () {
     return new Live2dAPI();
-  }
-}
+  },
+};
