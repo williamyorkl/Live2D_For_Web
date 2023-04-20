@@ -9,7 +9,7 @@
 		"DisplayInfo": "20220227toki.cdi3.json",
 		"Motions":{
 			"Idle": [
-				{"File":"random_pose_01.motion3.json" }
+				{"File":"random_pose_02.motion3.json" }
 			]
 		}
 	},
