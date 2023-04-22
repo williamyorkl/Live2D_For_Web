@@ -10,6 +10,18 @@
     body {
       margin: 0;
       overflow: hidden;
+
+      padding: 30px;
+      padding-right: 220px;
+      padding-top: 190px;
+
+    }
+
+    .container {
+      height: 100vh;
+      background: url("https://i.pinimg.com/564x/c7/01/ce/c701ce8250cde963091e2081d4826d76.jpg");
+      background-repeat: no-repeat;
+      background-size: contain;
     }
   </style>
   <script src="./live2dcubismcore.js"></script>
@@ -18,8 +30,10 @@
 </head>
 
 <body>
-  <input type="file" id="file-input">
-  <div id="audio-level"></div>
+  <div class="container">
+    <input type="file" id="file-input">
+    <div id="audio-level"></div>
+  </div>
 </body>
 <script>
   let live2dModel
@@ -73,22 +87,22 @@
           audioLevel = generateRandomNumber()
 
 
-          lipSyncParams.forEach((item, index) => {
-            live2dModel.setParameterValueById(item, audioLevel, 0.8);
-            live2dModel.saveParameters()
-            // live2dModel.update()
+          // lipSyncParams.forEach((item, index) => {
+          //   live2dModel.setParameterValueById(item, audioLevel, 0.8);
+          //   live2dModel.saveParameters()
+          //   // live2dModel.update()
 
-          });
+          // });
 
           // TypeScript
 
 
           document.getElementById("audio-level").innerHTML = `音频级别：${audioLevel.toFixed(2)}%`;
 
-        }, 50);
+        }, 350);
 
         // 播放音频
-        // source.start();
+        source.start();
       });
     };
     reader.readAsArrayBuffer(file);
@@ -106,7 +120,7 @@
   const ModelDir = ['Haru3'];
 
 
-  live2d.init(800, 800);
+  live2d.init(2500, 3000);
   live2d.changeModel('20220227toki', ResourcesPath);
   live2d.setBreathName("PARAM_BREATH");
   live2d.useCustomScale(false);
@@ -116,8 +130,6 @@
   live2d.scale(0.8);
   live2d.setXY(0, 0);
   live2d.setMotionRandom(true);
-
-
 
 
   console.log("🚀 ~ file: index.html:34 ~ live2d:", live2d)
@@ -133,19 +145,29 @@
     console.log("🚀 ~ file: index.html:51 ~ setTimeout ~ lipCountID:", lipCountID)
 
 
+    l2dModel = live2d.delegate._manager._model
+    const { _idParamAngleX,
+      _idParamAngleY,
+      _idParamAngleZ,
+      _idParamBodyAngleX,
+      _idParamBreath,
+      _idParamEyeBallX,
+      _idParamEyeBallY } = l2dModel
 
+    live2dModel.setParameterValueById(_idParamAngleX, 0);
+    live2dModel.setParameterValueById(_idParamAngleZ, 0);
+    live2dModel.setParameterValueById(_idParamBodyAngleX, 0);
+    live2dModel.setParameterValueById(_idParamEyeBallX, 0);
+    live2dModel.setParameterValueById(_idParamEyeBallY, 0);
+
+    live2dModel.saveParameters()
     lipSyncParams.push(lipCountID)
 
-    model.setParamFloat('ParamAngleX', 0);
-    model.setParamFloat('ParamAngleY', 0);
-    model.setParamFloat('ParamAngleZ', 0);
-    model.setParamFloat('ParamBodyAngleX', 0);
-    model.setParamFloat('ParamEyeBallX', 0);
-    model.setParamFloat('ParamEyeBallY', 0);
 
-    // 渲染模型
-    model.update();
-
+    const canvasDom = document.getElementById("canvas")
+    canvasDom.style.right = '-730px'
+    canvasDom.style.bottom = '-1531px'
+    // canvasDom.style.transform = 'scaleX(-1)'
 
   }, 300)
 
