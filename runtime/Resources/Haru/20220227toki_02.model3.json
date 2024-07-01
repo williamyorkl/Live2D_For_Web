@@ -1,0 +1,35 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "20220227toki_02.moc3",
+		"Textures": [
+			"20220227toki_02.4096/texture_00.png"
+		],
+		"Physics": "20220227toki_02.physics3.json",
+		"DisplayInfo": "20220227toki_02.cdi3.json"
+	},
+	"Motions": {
+		"Idle": [
+			{
+				"File": "random_pose_06.motion3.json"
+			}
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": [
+				"ParamMouthOpenY"
+			]
+		}
+	]
+}

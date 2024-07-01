@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>获取上传音频文件的音频级别</title>
+</head>
+
+<body>
+    <input type="file" id="file-input">
+    <div id="audio-level"></div>
+    <script>
+        // 选择上传的音频文件
+        const fileInput = document.getElementById("file-input");
+        fileInput.addEventListener("change", function () {
+            const file = fileInput.files[0];
+
+            // 使用Web Audio API解码音频文件
+            const context = new AudioContext();
+            const reader = new FileReader();
+            reader.onload = function () {
+                context.decodeAudioData(reader.result, function (buffer) {
+                    // 创建分析器
+                    const analyzer = context.createAnalyser();
+                    analyzer.fftSize = 2048;
+                    const bufferLength = analyzer.frequencyBinCount;
+                    const dataArray = new Uint8Array(bufferLength);
+
+                    // 连接音频源和分析器
+                    const source = context.createBufferSource();
+                    source.buffer = buffer;
+                    source.connect(analyzer);
+                    analyzer.connect(context.destination);
+
+                    // 每50ms更新音频级别值
+                    setInterval(function () {
+                        analyzer.getByteFrequencyData(dataArray);
+                        const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+                        const audioLevel = average / 255 * 100;
+
+                        lipSyncParams.forEach((paramId) => {
+                            _model.setParameterValue(paramId, audioLevel, 0.8);
+                        });
+
+                        document.getElementById("audio-level").innerHTML = `音频级别：${audioLevel.toFixed(2)}%`;
+                    }, 17);
+
+                    // 播放音频
+                    source.start();
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    </script>
+</body>
+
+</html>

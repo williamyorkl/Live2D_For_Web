@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1900">
+  <title>TypeScript HTML App</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+  <script src="./live2dcubismcore.js"></script>
+  <script src="./live2d.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/wavefile"></script>
+</head>
+
+<body>
+  <input type="file" id="file-input">
+  <div id="audio-level"></div>
+</body>
+<script>
+  let live2dModel
+  let lipCount
+  let lipCountID
+  const lipSyncParams = []
+  let live2d = window.live2d.new();
+
+
+
+  function generateRandomNumber() {
+    const numbers = [0, 0.5, 1];
+    const index = Math.floor(Math.random() * numbers.length);
+    const selectedNumber = numbers[index];
+    numbers.splice(index, 1);
+    return selectedNumber;
+  }
+
+  // 选择上传的音频文件
+  const fileInput = document.getElementById("file-input");
+  fileInput.addEventListener("change", function () {
+    const file = fileInput.files[0];
+
+    // 使用Web Audio API解码音频文件
+    const context = new AudioContext();
+    const reader = new FileReader();
+    reader.onload = function () {
+      context.decodeAudioData(reader.result, function (buffer) {
+        // 创建分析器
+        const analyzer = context.createAnalyser();
+        analyzer.fftSize = 2048;
+        const bufferLength = analyzer.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        // 连接音频源和分析器
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(analyzer);
+        analyzer.connect(context.destination);
+
+        // 每50ms更新音频级别值
+        setInterval(function () {
+          analyzer.getByteFrequencyData(dataArray);
+          const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+          let audioLevel = average / 100;
+
+
+          console.log("🚀 ~ file: index.html:58 ~ audioLevel:", audioLevel)
+
+          // TODO - 添加暂停逻辑
+          audioLevel = generateRandomNumber() + audioLevel
+
+
+          lipSyncParams.forEach((item, index) => {
+            live2dModel.setParameterValueById(item, audioLevel, 1);
+            live2dModel.saveParameters()
+            // live2dModel.update()
+          });
+
+
+          document.getElementById("audio-level").innerHTML = `音频级别：${audioLevel.toFixed(2)}%`;
+
+        }, 100);
+
+        // 播放音频
+        source.start();
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+
+
+
+  // 相対パス
+  const ResourcesPath = './Resources/Haru';
+
+  // モデル定義---------------------------------------------
+  // モデルを配置したディレクトリ名の配列
+  // ディレクトリ名とmodel3.jsonの名前を一致させておくこと
+  const ModelDir = ['Haru'];
+
+
+  live2d.init(800, 800);
+  // live2d.changeModel('20220227toki', ResourcesPath);
+  live2d.changeModel('20220227toki_02', ResourcesPath);
+  //live2d.setBreathName("PARAM_BREATH");
+  live2d.useCustomScale(false);
+  live2d.initModel();
+  live2d.addListener();
+  live2d.run();
+  live2d.scale(0.8);
+  live2d.setXY(0, 0);
+  live2d.setMotionRandom(true);
+
+  console.log("🚀 ~ file: index.html:34 ~ live2d:", live2d)
+
+  setTimeout(() => {
+    live2dModel = live2d.delegate._manager._model._model
+    lipCount = live2d.delegate._manager._model._modelSetting.getLipSyncParameterCount()
+    lipCountID = live2d.delegate._manager._model._modelSetting.getLipSyncParameterId(0)
+
+    console.log("🚀 ~ file: index.html:103 ~ setTimeout ~ live2d:", live2d)
+    console.log("🚀 ~ file: index.html:99 ~ setTimeout ~ live2dModel:", live2dModel)
+    console.log("🚀 ~ file: index.html:51 ~ setTimeout ~ lipCountID:", lipCountID)
+    console.log("🚀 ~ file: index.html:49 ~ lipCount:", lipCount)
+
+    lipSyncParams.push(lipCountID)
+  }, 300)
+</script>
+
+</html>
